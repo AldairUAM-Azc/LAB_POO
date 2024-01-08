@@ -1,8 +1,8 @@
 #include <stdio.h>
-#
 
 const int TOTAL_REGISTROS = 9;
 const int MAX_LINE_BUFFER = 25;
+const char[] ruta_datos = "DATOS.dat";
 
 
 typedef struct 
@@ -24,7 +24,7 @@ void main(){
   const Campo[TOTAL_REGISTROS] Indice; 
   //1. Escribe archivo Registros.txt
   //2. Crear archivo binario DATOS.dat en modo escritura
-  FILE* datos = fopen("DATOS.dat", "wb");
+  FILE* datos = fopen(ruta_datos, "wb");
   fclose(datos);
 
   struct TRegsitro reg;
@@ -40,7 +40,7 @@ void main(){
   ordernar_indice(Indice, TOTAL_REGISTROS);
 
   // Usuario
-  FILE* datos = fopen("DATOS.dat", "r");
+  FILE* datos = fopen(ruta_datos, "r");
   char option = '';
   char[10] codigo;
   while(option != 'n'){
@@ -62,6 +62,8 @@ void main(){
   }
   printf("Adios!");
   fclose(datos);
+  serializa_indice(Indice);
+    
 }
 
 void ordenar_indice(Campo[] Indice, int n){
@@ -97,7 +99,7 @@ void actualizar_indice(struct TRegistro* reg, int cnt){
 }
 
 void serializar_registro(struct TRegistro* reg){
-  FILE* datos = fopen("DATOS.dat", "wb+");
+  FILE* datos = fopen(ruta_datos, "wb+");
   fwrite(reg, sizeof(struct TRegistro), 1, datos);
   fclose(datos);
 }
@@ -173,4 +175,33 @@ void clear_buffer(char* buffer, int cap){
   for(int i = 0 ; i < cap +1;i++){
     buffer[i] = '\0';
   }
+}
+void serializa_indice(Campo[] Indice){
+    FILE* file_indice = fopen("Indice.dat", "wb");
+    fwrite(Indice, sizeof(Indice), 1, file_indice);
+    fclose(file_indice);
+}
+void test_datos(){
+    FILE* datos = fopen(ruta_datos, "r");
+    struct TRegistro reg;
+    int i = 0; // pick record to test
+    fseek(datos, i*sizeof(struct TRegistro), SEEK_SET);
+    fread(&reg, sizeof(struct TRegistro), 1, datos);
+    imprimir_registro(&reg);
+    fclose(datos);
+}
+
+void test_indice(Campo[] indice){
+    int i = 0;
+    printf("Indice");
+    printf("RRN: %s\n", indice[i].RRN);
+    printf("Codigo: %s\n", indice[i].codigo);
+}
+
+void test_indice_file(){
+    FILE* file_indice = fopen("Indice.dat", "rb");
+    Campo[TOTAL_REGISTROS] Indice;
+    fread(Indice, sizeof(Indice), 1, file_indice);
+    fclose(file_indice);
+    test_indice(Indice);
 }
